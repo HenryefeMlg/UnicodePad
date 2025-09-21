@@ -5,7 +5,7 @@
   <title>Henry Games Unicode Pad</title>
   <style>
     :root {
-      --bg-color: #fdf7e3; /* ilk açılış krem renk */
+      --bg-color: #fdf7e3;
       --panel-bg: #ffffff;
       --button-color: #f0f0f0;
     }
@@ -21,11 +21,18 @@
     header {
       background: var(--bg-color);
       width: 100%;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 1.4rem;
       font-weight: bold;
       padding: 10px;
       position: relative;
+    }
+    #logo {
+      position: absolute;
+      left: 10px;
+      height: 40px;
     }
     #settingsBtn {
       position: absolute;
@@ -100,11 +107,12 @@
 </head>
 <body>
   <header>
+    <img src="hg.png" id="logo" alt="Logo">
     Henry Games Unicode Pad
     <span id="settingsBtn">⚙️</span>
   </header>  <textarea id="selectedBox" placeholder="Seçilen karakterler buraya eklenecek..."></textarea><button id="copyBtn">Kopyala 📋</button>
 
-  <div id="charPanel"></div>  <!-- Tema Paneli -->  <div id="themePanel">
+  <div id="charPanel"></div>  <div id="themePanel">
     <button id="closeTheme">❌</button>
     <label>Renk Seç:</label>
     <input type="color" id="bgColorPicker" value="#fdf7e3">
