@@ -1,167 +1,121 @@
-l‎
-+176
-Lines changed: 176 additions & 0 deletions
-Original file line number	Diff line number	Diff line change
-@@ -0,0 +1,176 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unicode Pad</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: var(--bg-color, #fdf7e3);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      background-color: rgba(0,0,0,0.05);
-    }
-    .logo {
-      height: 65px; /* biraz büyütüldü */
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .logo:hover {
-      transform: scale(1.1);
-    }
-    #charPanel {
-      flex: 1;
-      overflow-y: auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-      gap: 5px;
-      padding: 10px;
-      background-color: rgba(0,0,0,0.02);
-    }
-    .char {
-      font-size: 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
-      border-radius: 8px;
-      transition: background 0.2s ease;
-    }
-    .char:hover {
-      background: rgba(0,0,0,0.1);
-    }
-    #selectedBox {
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      background-color: rgba(0,0,0,0.05);
-    }
-    #selectedText {
-      flex: 1;
-      padding: 5px;
-      font-size: 1.2rem;
-    }
-    #copyBtn {
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-    #themeBtn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      cursor: pointer;
-    }
-    #themePanel {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 20px;
-      z-index: 100;
-    }
-    #closeTheme {
-      float: right;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Henry Games Unicode Pad</title>
+<style>
+:root {
+  --bg-color: #fff8dc;
+  --panel-bg: #fff;
+  --text-color: #000;
+  --button-bg: #4CAF50;
+  --button-hover: #45a049;
+}
+body { font-family: Arial; margin:0; padding:15px; background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; }
+h1 { text-align:center; font-size:1.8em; margin-bottom:10px; color: var(--text-color);}
+#topText { width:100%; min-height:100px; padding:10px; font-size:1.2em; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; resize:vertical; background: var(--panel-bg); color: var(--text-color); transition: background 0.3s, color 0.3s;}
+#charPanel { position:relative; width:100%; min-height:400px; max-height:80vh; overflow-y:scroll; border:1px solid #ccc; border-radius:8px; background: var(--panel-bg); display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:4px; transition: background 0.3s; }
+.char-btn { display:flex; justify-content:center; align-items:center; font-size:1.5em; border-radius:4px; cursor:pointer; user-select:none; background:#fff; border:1px solid #ddd; }
+.char-btn:hover { background:#e0e0e0; }
+button.copy-btn { width:100%; padding:10px; font-size:1.2em; background: var(--button-bg); color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom:10px; }
+button.copy-btn:hover { background: var(--button-hover); }
+#themeBtn { position:fixed; top:10px; right:10px; padding:8px 12px; border:none; border-radius:50%; cursor:pointer; background:#333; color:white; z-index:1000; font-size:1.2em; }
+#themePanel { position:fixed; top:50px; right:10px; padding:10px; border:1px solid #ccc; border-radius:6px; background:white; display:none; z-index:1000; }
+#themePanel input[type=color], #themePanel input[type=text] { margin-bottom:5px; width:100%; padding:5px; border-radius:4px; border:1px solid #ccc; }
+#themePanel button { width:100%; padding:5px; border:none; border-radius:4px; background:#4CAF50; color:white; cursor:pointer; }
+#themePanel button:hover { background:#45a049; }
+/* Mobile */
+@media(max-width:600px){ #charPanel{grid-template-columns:repeat(auto-fill,minmax(30px,1fr));} .char-btn{font-size:1.2em;padding:6px;} #themeBtn{font-size:1em;padding:6px;} }
+</style>
 </head>
 <body>
-  <header>
-    <a href="https://henryefemlg.github.io/UnicodePad/">
-      <img src="hg.png" alt="Henry Games Logo" class="logo">
-    </a>
-  </header>
-  <div id="charPanel"></div>
-  <div id="selectedBox">
-    <input type="text" id="selectedText" placeholder="Seçilen karakterler burada">
-    <button id="copyBtn">Kopyala</button>
-  </div>
-  <button id="themeBtn">⚙️</button>
-  <div id="themePanel">
-    <button id="closeTheme">❌</button>
-    <h3>Tema Seç</h3>
-    <input type="color" id="bgColorPicker">
-    <input type="text" id="bgHexInput" placeholder="#HEX">
-    <button onclick="applyTheme()">Tamam</button>
-  </div>
-  <audio id="copySound" src="soundclip.wav"></audio>
-  <script>
-    const charPanel = document.getElementById('charPanel');
-    const selectedText = document.getElementById('selectedText');
-    const copyBtn = document.getElementById('copyBtn');
-    const copySound = document.getElementById('copySound');
-    const themeBtn = document.getElementById('themeBtn');
-    const themePanel = document.getElementById('themePanel');
-    const closeTheme = document.getElementById('closeTheme');
-    const bgColorPicker = document.getElementById('bgColorPicker');
-    const bgHexInput = document.getElementById('bgHexInput');
-    let allChars = [];
-    for (let i = 33; i < 10000; i++) {
-      allChars.push(String.fromCodePoint(i));
-    }
-    function loadChars() {
-      allChars.forEach(ch => {
-        const div = document.createElement('div');
-        div.className = 'char';
-        div.textContent = ch;
-        div.addEventListener('click', () => {
-          selectedText.value += ch;
-        });
-        charPanel.appendChild(div);
-      });
-    }
-    loadChars();
-    copyBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(selectedText.value);
-      copySound.play();
-    });
-    themeBtn.addEventListener('click', () => {
-      themePanel.style.display = 'block';
-    });
-    closeTheme.addEventListener('click', () => {
-      themePanel.style.display = 'none';
-    });
-    function applyTheme() {
-      let color = bgHexInput.value || bgColorPicker.value;
-      document.body.style.setProperty('--bg-color', color);
-      localStorage.setItem('bgColor', color);
-      themePanel.style.display = 'none';
-    }
-    window.onload = () => {
-      const savedColor = localStorage.getItem('bgColor');
-      if (savedColor) {
-        document.body.style.setProperty('--bg-color', savedColor);
-      }
-    }
-  </script>
+
+<h1>Henry Games Unicode Pad</h1>
+<textarea id="topText" placeholder="Seçilen karakterler buraya eklenecek..."></textarea>
+<button class="copy-btn" onclick="copyAll()">Kopyala 📋</button>
+
+<div id="charPanel"></div>
+<audio id="copySound" src="soundclip.wav"></audio>
+
+<!-- Tema emoji butonu -->
+<button id="themeBtn">⚙️</button>
+<div id="themePanel">
+  <label>Renk Seç (arka plan)</label>
+  <input type="color" id="bgColorPicker" value="#fff8dc">
+  <label>Hex Kodu Gir</label>
+  <input type="text" id="bgHexInput" placeholder="#fff8dc">
+  <button onclick="applyTheme()">Tamam</button>
+</div>
+
+<script>
+const panel = document.getElementById('charPanel');
+const topText = document.getElementById('topText');
+const copySound = document.getElementById('copySound');
+
+// Unicode karakterleri (~1.1-1.9M)
+const unicodeData = [];
+for(let i=0x0020;i<=0x10FFFF;i++){
+  try{ unicodeData.push(String.fromCodePoint(i)); }
+  catch(e){ continue; }
+}
+
+let loadedChars = 0;
+const chunkSize = 500;
+
+// Sürekli scroll yükleme
+function loadMoreChars(){
+  const end = Math.min(loadedChars + chunkSize, unicodeData.length);
+  for(let i=loadedChars; i<end; i++){
+    const btn = document.createElement('div');
+    btn.textContent = unicodeData[i];
+    btn.className = 'char-btn';
+    btn.onclick = ()=>topText.value += unicodeData[i];
+    panel.appendChild(btn);
+  }
+  loadedChars = end;
+}
+
+panel.addEventListener('scroll', ()=>{
+  if(panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 5){
+    if(loadedChars < unicodeData.length) loadMoreChars();
+  }
+});
+
+// İlk yükleme
+loadMoreChars();
+
+// Kopyala ve ses
+function copyAll(){
+  navigator.clipboard.writeText(topText.value)
+    .then(()=>{ copySound.play(); alert("Kopyalandı!"); })
+    .catch(err=>alert("Kopyalama başarısız: "+err));
+}
+
+// Tema paneli aç/kapa
+const themeBtn = document.getElementById('themeBtn');
+const themePanel = document.getElementById('themePanel');
+themeBtn.addEventListener('click', ()=>{ themePanel.style.display = themePanel.style.display==='block'?'none':'block'; });
+
+// Tema uygula ve kaydet
+function applyTheme(){
+  let hex = document.getElementById('bgHexInput').value.trim();
+  let color = document.getElementById('bgColorPicker').value;
+  const finalColor = hex !== '' ? hex : color;
+  document.documentElement.style.setProperty('--bg-color', finalColor);
+  localStorage.setItem('savedTheme', finalColor); // Her değişiklikte kaydet
+}
+
+// Sayfa açıldığında kaydedilen temayı uygula
+window.addEventListener('load', ()=>{
+  const saved = localStorage.getItem('savedTheme');
+  if(saved){
+    document.documentElement.style.setProperty('--bg-color', saved);
+    document.getElementById('bgColorPicker').value = saved;
+    document.getElementById('bgHexInput').value = saved;
+  }
+});
+</script>
+
 </body>
 </html>
