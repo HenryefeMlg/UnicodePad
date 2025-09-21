@@ -12,10 +12,10 @@
   --button-bg: #4CAF50;
   --button-hover: #45a049;
 }
-body { font-family: Arial; margin:0; padding:15px; background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s;}
+body { font-family: Arial; margin:0; padding:15px; background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; }
 h1 { text-align:center; font-size:1.8em; margin-bottom:10px; color: var(--text-color);}
 #topText { width:100%; min-height:100px; padding:10px; font-size:1.2em; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; resize:vertical; background: var(--panel-bg); color: var(--text-color); transition: background 0.3s, color 0.3s;}
-#charPanel { position:relative; width:100%; height:60vh; overflow-y:auto; border:1px solid #ccc; border-radius:8px; background: var(--panel-bg); display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:4px; transition: background 0.3s;}
+#charPanel { position:relative; width:100%; height:60vh; overflow-y:auto; border:1px solid #ccc; border-radius:8px; background: var(--panel-bg); display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:4px; transition: background 0.3s; }
 .char-btn { display:flex; justify-content:center; align-items:center; font-size:1.5em; border-radius:4px; cursor:pointer; user-select:none; background:#fff; border:1px solid #ddd; }
 .char-btn:hover { background:#e0e0e0; }
 button.copy-btn { width:100%; padding:10px; font-size:1.2em; background: var(--button-bg); color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom:10px; }
@@ -53,38 +53,37 @@ const panel = document.getElementById('charPanel');
 const topText = document.getElementById('topText');
 const copySound = document.getElementById('copySound');
 
-// Virtualized Unicode
+// Tüm Unicode karakterleri (~1.1-1.9M)
 const unicodeData = [];
-for(let i=0x0020;i<=0x10FFFF;i++){ try{ unicodeData.push(String.fromCodePoint(i)); }catch(e){continue;} }
-
-let startIndex=0;
-const chunkSize=500;
-
-// Render görünür chunk
-function renderChunk(){
-  panel.innerHTML='';
-  const end=Math.min(startIndex+chunkSize,unicodeData.length);
-  for(let i=startIndex;i<end;i++){
-    const btn=document.createElement('div');
-    btn.textContent=unicodeData[i];
-    btn.className='char-btn';
-    btn.onclick=()=>topText.value+=unicodeData[i];
-    panel.appendChild(btn);
-  }
+for(let i=0x0020;i<=0x10FFFF;i++){
+  try{ unicodeData.push(String.fromCodePoint(i)); }
+  catch(e){ continue; }
 }
 
-// Scroll event lazy load
-panel.addEventListener('scroll',()=>{
+let loadedChars = 0;
+const chunkSize = 500;
+
+// Scroll ile sürekli yükleme (eski sistem gibi)
+function loadMoreChars(){
+  const end = Math.min(loadedChars + chunkSize, unicodeData.length);
+  for(let i=loadedChars; i<end; i++){
+    const btn = document.createElement('div');
+    btn.textContent = unicodeData[i];
+    btn.className = 'char-btn';
+    btn.onclick = ()=>topText.value += unicodeData[i];
+    panel.appendChild(btn);
+  }
+  loadedChars = end;
+}
+
+panel.addEventListener('scroll', ()=>{
   if(panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 5){
-    if(startIndex+chunkSize < unicodeData.length){
-      startIndex+=chunkSize;
-      renderChunk();
-    }
+    if(loadedChars < unicodeData.length) loadMoreChars();
   }
 });
 
-// İlk render
-renderChunk();
+// İlk yükleme
+loadMoreChars();
 
 // Kopyala ve ses
 function copyAll(){
@@ -93,16 +92,17 @@ function copyAll(){
     .catch(err=>alert("Kopyalama başarısız: "+err));
 }
 
-// Tema
-const themeBtn=document.getElementById('themeBtn');
-const themePanel=document.getElementById('themePanel');
-themeBtn.addEventListener('click',()=>{ themePanel.style.display=themePanel.style.display==='block'?'none':'block'; });
+// Tema paneli aç/kapa
+const themeBtn = document.getElementById('themeBtn');
+const themePanel = document.getElementById('themePanel');
+themeBtn.addEventListener('click', ()=>{ themePanel.style.display = themePanel.style.display==='block'?'none':'block'; });
 
+// Tema uygula ve kaydet
 function applyTheme(){
-  const color=document.getElementById('bgColorPicker').value;
-  const hex=document.getElementById('bgHexInput').value;
-  const finalColor=hex?hex:color;
-  document.documentElement.style.setProperty('--bg-color',finalColor);
+  const color = document.getElementById('bgColorPicker').value;
+  const hex = document.getElementById('bgHexInput').value;
+  const finalColor = hex ? hex : color;
+  document.documentElement.style.setProperty('--bg-color', finalColor);
   localStorage.setItem('savedTheme', finalColor); // Kaydet
   themePanel.style.display='none';
 }
