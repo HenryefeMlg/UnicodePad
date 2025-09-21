@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -93,10 +94,16 @@
     <a href="https://henryefemlg.github.io/UnicodePad/">
       <img src="hg.png" alt="Henry Games Logo" class="logo">
     </a>
-  </header>  <div id="charPanel"></div>  <div id="selectedBox">
+  </header>
+
+  <div id="charPanel"></div>
+
+  <div id="selectedBox">
     <input type="text" id="selectedText" placeholder="Seçilen karakterler burada">
     <button id="copyBtn">Kopyala</button>
-  </div><button id="themeBtn">⚙️</button>
+  </div>
+
+  <button id="themeBtn">⚙️</button>
 
   <div id="themePanel">
     <button id="closeTheme">❌</button>
@@ -104,7 +111,9 @@
     <input type="color" id="bgColorPicker">
     <input type="text" id="bgHexInput" placeholder="#HEX">
     <button onclick="applyTheme()">Tamam</button>
-  </div><audio id="copySound" src="soundclip.wav"></audio>
+  </div>
+
+  <audio id="copySound" src="soundclip.wav"></audio>
 
   <script>
     const charPanel = document.getElementById('charPanel');
@@ -162,5 +171,6 @@
         document.body.style.setProperty('--bg-color', savedColor);
       }
     }
-  </script></body>
+  </script>
+</body>
 </html>
