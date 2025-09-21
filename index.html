@@ -15,7 +15,7 @@
 body { font-family: Arial; margin:0; padding:15px; background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; }
 h1 { text-align:center; font-size:1.8em; margin-bottom:10px; color: var(--text-color);}
 #topText { width:100%; min-height:100px; padding:10px; font-size:1.2em; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; resize:vertical; background: var(--panel-bg); color: var(--text-color); transition: background 0.3s, color 0.3s;}
-#charPanel { position:relative; width:100%; height:60vh; overflow-y:auto; border:1px solid #ccc; border-radius:8px; background: var(--panel-bg); display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:4px; transition: background 0.3s; }
+#charPanel { position:relative; width:100%; min-height:400px; max-height:80vh; overflow-y:scroll; border:1px solid #ccc; border-radius:8px; background: var(--panel-bg); display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:4px; transition: background 0.3s; }
 .char-btn { display:flex; justify-content:center; align-items:center; font-size:1.5em; border-radius:4px; cursor:pointer; user-select:none; background:#fff; border:1px solid #ddd; }
 .char-btn:hover { background:#e0e0e0; }
 button.copy-btn { width:100%; padding:10px; font-size:1.2em; background: var(--button-bg); color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom:10px; }
@@ -63,7 +63,7 @@ for(let i=0x0020;i<=0x10FFFF;i++){
 let loadedChars = 0;
 const chunkSize = 500;
 
-// Scroll ile sürekli yükleme (eski sistem gibi)
+// Sürekli scroll ile yükleme
 function loadMoreChars(){
   const end = Math.min(loadedChars + chunkSize, unicodeData.length);
   for(let i=loadedChars; i<end; i++){
@@ -99,12 +99,11 @@ themeBtn.addEventListener('click', ()=>{ themePanel.style.display = themePanel.s
 
 // Tema uygula ve kaydet
 function applyTheme(){
-  const color = document.getElementById('bgColorPicker').value;
-  const hex = document.getElementById('bgHexInput').value;
-  const finalColor = hex ? hex : color;
+  let hex = document.getElementById('bgHexInput').value.trim();
+  let color = document.getElementById('bgColorPicker').value;
+  const finalColor = hex !== '' ? hex : color; // Hex varsa al, yoksa color picker
   document.documentElement.style.setProperty('--bg-color', finalColor);
-  localStorage.setItem('savedTheme', finalColor); // Kaydet
-  themePanel.style.display='none';
+  localStorage.setItem('savedTheme', finalColor); // Her değişiklikte kaydet
 }
 
 // Sayfa açıldığında kaydedilen temayı uygula
