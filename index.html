@@ -1,4 +1,10 @@
-<!DOCTYPE html><html lang="tr">
+l‎
++176
+Lines changed: 176 additions & 0 deletions
+Original file line number	Diff line number	Diff line change
+@@ -0,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +25,7 @@
       background-color: rgba(0,0,0,0.05);
     }
     .logo {
-      height: 50px;
+      height: 65px; /* biraz büyütüldü */
       cursor: pointer;
       transition: transform 0.2s ease;
     }
@@ -93,19 +99,21 @@
     <a href="https://henryefemlg.github.io/UnicodePad/">
       <img src="hg.png" alt="Henry Games Logo" class="logo">
     </a>
-  </header>  <div id="charPanel"></div>  <div id="selectedBox">
+  </header>
+  <div id="charPanel"></div>
+  <div id="selectedBox">
     <input type="text" id="selectedText" placeholder="Seçilen karakterler burada">
     <button id="copyBtn">Kopyala</button>
-  </div><button id="themeBtn">⚙️</button>
-
+  </div>
+  <button id="themeBtn">⚙️</button>
   <div id="themePanel">
     <button id="closeTheme">❌</button>
     <h3>Tema Seç</h3>
     <input type="color" id="bgColorPicker">
     <input type="text" id="bgHexInput" placeholder="#HEX">
     <button onclick="applyTheme()">Tamam</button>
-  </div><audio id="copySound" src="soundclip.wav"></audio>
-
+  </div>
+  <audio id="copySound" src="soundclip.wav"></audio>
   <script>
     const charPanel = document.getElementById('charPanel');
     const selectedText = document.getElementById('selectedText');
@@ -116,12 +124,10 @@
     const closeTheme = document.getElementById('closeTheme');
     const bgColorPicker = document.getElementById('bgColorPicker');
     const bgHexInput = document.getElementById('bgHexInput');
-
     let allChars = [];
     for (let i = 33; i < 10000; i++) {
       allChars.push(String.fromCodePoint(i));
     }
-
     function loadChars() {
       allChars.forEach(ch => {
         const div = document.createElement('div');
@@ -133,34 +139,29 @@
         charPanel.appendChild(div);
       });
     }
-
     loadChars();
-
     copyBtn.addEventListener('click', () => {
       navigator.clipboard.writeText(selectedText.value);
       copySound.play();
     });
-
     themeBtn.addEventListener('click', () => {
       themePanel.style.display = 'block';
     });
-
     closeTheme.addEventListener('click', () => {
       themePanel.style.display = 'none';
     });
-
     function applyTheme() {
       let color = bgHexInput.value || bgColorPicker.value;
       document.body.style.setProperty('--bg-color', color);
       localStorage.setItem('bgColor', color);
       themePanel.style.display = 'none';
     }
-
     window.onload = () => {
       const savedColor = localStorage.getItem('bgColor');
       if (savedColor) {
         document.body.style.setProperty('--bg-color', savedColor);
       }
     }
-  </script></body>
+  </script>
+</body>
 </html>
