@@ -3,70 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unicode Pad</title>
+  <title>Henry Games Unicode Pad</title>
   <style>
+    :root {
+      --bg-color: #fdf7e3;
+      --panel-bg: #ffffff;
+      --button-color: #f0f0f0;
+    }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: var(--bg-color, #fdf7e3);
+      font-family: sans-serif;
+      background: var(--bg-color);
       display: flex;
       flex-direction: column;
+      align-items: center;
       height: 100vh;
     }
     header {
+      background: var(--bg-color);
+      width: 100%;
       display: flex;
       align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: bold;
       padding: 10px;
-      background-color: rgba(0,0,0,0.05);
+      position: relative;
     }
-    .logo {
-      height: 50px;
+    #logo {
+      position: absolute;
+      left: 10px;
+      height: 40px;
+    }
+    #settingsBtn {
+      position: absolute;
+      right: 10px;
+      top: 10px;
       cursor: pointer;
-      transition: transform 0.2s ease;
     }
-    .logo:hover {
-      transform: scale(1.1);
+    #selectedBox {
+      width: 90%;
+      max-width: 700px;
+      height: 80px;
+      margin: 5px 0;
+      font-size: 1.2rem;
+      padding: 8px;
+    }
+    #copyBtn {
+      background: #4CAF50;
+      color: white;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 8px;
     }
     #charPanel {
       flex: 1;
+      width: 100%;
+      max-width: 900px;
       overflow-y: auto;
+      background: var(--panel-bg);
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-      gap: 5px;
-      padding: 10px;
-      background-color: rgba(0,0,0,0.02);
+      grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+      gap: 4px;
+      padding: 4px;
     }
-    .char {
-      font-size: 1.5rem;
+    .char-btn {
+      background: var(--button-color);
+      border: 1px solid #ddd;
       text-align: center;
       cursor: pointer;
-      user-select: none;
-      border-radius: 8px;
-      transition: background 0.2s ease;
-    }
-    .char:hover {
-      background: rgba(0,0,0,0.1);
-    }
-    #selectedBox {
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      background-color: rgba(0,0,0,0.05);
-    }
-    #selectedText {
-      flex: 1;
-      padding: 5px;
       font-size: 1.2rem;
-    }
-    #copyBtn {
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-    #themeBtn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      cursor: pointer;
+      user-select: none;
     }
     #themePanel {
       display: none;
@@ -74,41 +83,45 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: white;
+      background: #fff;
       border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 20px;
-      z-index: 100;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+    #themePanel input {
+      display: block;
+      margin-bottom: 10px;
+    }
+    #themePanel button {
+      padding: 6px 10px;
     }
     #closeTheme {
       float: right;
-      cursor: pointer;
       background: none;
       border: none;
       font-size: 1.2rem;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <header>
-    <a href="https://henryefemlg.github.io/UnicodePad/">
-      <img src="hg.png" alt="Henry Games Logo" class="logo">
-    </a>
+    <img src="hg.png" id="logo" alt="Logo">
+    Henry Games Unicode Pad
+    <span id="settingsBtn">⚙️</span>
   </header>
+
+  <textarea id="selectedBox" placeholder="Seçilen karakterler buraya eklenecek..."></textarea>
+  <button id="copyBtn">Kopyala 📋</button>
 
   <div id="charPanel"></div>
 
-  <div id="selectedBox">
-    <input type="text" id="selectedText" placeholder="Seçilen karakterler burada">
-    <button id="copyBtn">Kopyala</button>
-  </div>
-
-  <button id="themeBtn">⚙️</button>
-
   <div id="themePanel">
     <button id="closeTheme">❌</button>
-    <h3>Tema Seç</h3>
-    <input type="color" id="bgColorPicker">
+    <label>Renk Seç:</label>
+    <input type="color" id="bgColorPicker" value="#fdf7e3">
     <input type="text" id="bgHexInput" placeholder="#HEX">
     <button onclick="applyTheme()">Tamam</button>
   </div>
@@ -116,61 +129,63 @@
   <audio id="copySound" src="soundclip.wav"></audio>
 
   <script>
-    const charPanel = document.getElementById('charPanel');
-    const selectedText = document.getElementById('selectedText');
-    const copyBtn = document.getElementById('copyBtn');
+    const panel = document.getElementById('charPanel');
+    const selectedBox = document.getElementById('selectedBox');
     const copySound = document.getElementById('copySound');
-    const themeBtn = document.getElementById('themeBtn');
-    const themePanel = document.getElementById('themePanel');
-    const closeTheme = document.getElementById('closeTheme');
-    const bgColorPicker = document.getElementById('bgColorPicker');
-    const bgHexInput = document.getElementById('bgHexInput');
 
-    let allChars = [];
-    for (let i = 33; i < 10000; i++) {
-      allChars.push(String.fromCodePoint(i));
-    }
+    let currentCode = 33;
+    const chunkSize = 1500;
+    const maxCodePoint = 65535;
 
-    function loadChars() {
-      allChars.forEach(ch => {
-        const div = document.createElement('div');
-        div.className = 'char';
-        div.textContent = ch;
-        div.addEventListener('click', () => {
-          selectedText.value += ch;
+    function loadChunk() {
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < chunkSize && currentCode <= maxCodePoint; i++, currentCode++) {
+        const btn = document.createElement('div');
+        btn.className = 'char-btn';
+        btn.textContent = String.fromCharCode(currentCode);
+        btn.addEventListener('click', () => {
+          selectedBox.value += btn.textContent;
         });
-        charPanel.appendChild(div);
-      });
+        frag.appendChild(btn);
+      }
+      panel.appendChild(frag);
     }
 
-    loadChars();
+    panel.addEventListener('scroll', () => {
+      if (panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 10) {
+        loadChunk();
+      }
+    });
 
-    copyBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(selectedText.value);
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(selectedBox.value);
       copySound.play();
     });
 
-    themeBtn.addEventListener('click', () => {
-      themePanel.style.display = 'block';
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+      document.getElementById('themePanel').style.display = 'block';
     });
 
-    closeTheme.addEventListener('click', () => {
-      themePanel.style.display = 'none';
+    document.getElementById('closeTheme').addEventListener('click', () => {
+      document.getElementById('themePanel').style.display = 'none';
     });
 
     function applyTheme() {
-      let color = bgHexInput.value || bgColorPicker.value;
-      document.body.style.setProperty('--bg-color', color);
-      localStorage.setItem('bgColor', color);
-      themePanel.style.display = 'none';
+      const hex = document.getElementById('bgHexInput').value.trim();
+      const color = document.getElementById('bgColorPicker').value;
+      const finalColor = hex !== '' ? hex : color;
+      document.documentElement.style.setProperty('--bg-color', finalColor);
+      localStorage.setItem('savedTheme', finalColor);
+      document.getElementById('themePanel').style.display = 'none';
     }
 
-    window.onload = () => {
-      const savedColor = localStorage.getItem('bgColor');
-      if (savedColor) {
-        document.body.style.setProperty('--bg-color', savedColor);
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('savedTheme');
+      if (saved) {
+        document.documentElement.style.setProperty('--bg-color', saved);
       }
-    }
+      loadChunk();
+    });
   </script>
 </body>
 </html>
