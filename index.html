@@ -53,7 +53,7 @@ const panel = document.getElementById('charPanel');
 const topText = document.getElementById('topText');
 const copySound = document.getElementById('copySound');
 
-// Tüm Unicode karakterleri (~1.1-1.9M)
+// Unicode karakterleri (~1.1-1.9M)
 const unicodeData = [];
 for(let i=0x0020;i<=0x10FFFF;i++){
   try{ unicodeData.push(String.fromCodePoint(i)); }
@@ -63,7 +63,7 @@ for(let i=0x0020;i<=0x10FFFF;i++){
 let loadedChars = 0;
 const chunkSize = 500;
 
-// Sürekli scroll ile yükleme
+// Sürekli scroll yükleme
 function loadMoreChars(){
   const end = Math.min(loadedChars + chunkSize, unicodeData.length);
   for(let i=loadedChars; i<end; i++){
@@ -101,7 +101,7 @@ themeBtn.addEventListener('click', ()=>{ themePanel.style.display = themePanel.s
 function applyTheme(){
   let hex = document.getElementById('bgHexInput').value.trim();
   let color = document.getElementById('bgColorPicker').value;
-  const finalColor = hex !== '' ? hex : color; // Hex varsa al, yoksa color picker
+  const finalColor = hex !== '' ? hex : color;
   document.documentElement.style.setProperty('--bg-color', finalColor);
   localStorage.setItem('savedTheme', finalColor); // Her değişiklikte kaydet
 }
