@@ -14,8 +14,8 @@
 }
 body { font-family: Arial; margin:0; padding:15px; background: var(--bg-color); color: var(--text-color); transition: background 0.3s, color 0.3s; }
 h1 { text-align:center; font-size:1.8em; margin-bottom:10px; color: var(--text-color);}
-#topText { width:100%; min-height:100px; padding:10px; font-size:1.2em; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; resize:vertical; background: var(--panel-bg); color: var(--text-color); transition: background 0.3s, color 0.3s;}
-#charPanel { position:relative; width:100%; min-height:400px; max-height:80vh; overflow-y:scroll; border:1px solid #ccc; border-radius:8px; background: var(--panel-bg); display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:4px; transition: background 0.3s; }
+#topText { width:100%; min-height:100px; padding:10px; font-size:1.2em; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; resize:vertical; background: var(--panel-bg); color: var(--text-color); transition: background 0.3s, color 0.3s; max-height:30vh;}
+#charPanel { position:relative; width:100%; min-height:600px; max-height:calc(100vh - 250px); overflow-y:scroll; border:1px solid #ccc; border-radius:8px; background: var(--panel-bg); display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:4px; transition: background 0.3s; }
 .char-btn { display:flex; justify-content:center; align-items:center; font-size:1.5em; border-radius:4px; cursor:pointer; user-select:none; background:#fff; border:1px solid #ddd; }
 .char-btn:hover { background:#e0e0e0; }
 button.copy-btn { width:100%; padding:10px; font-size:1.2em; background: var(--button-bg); color:white; border:none; border-radius:8px; cursor:pointer; margin-bottom:10px; }
@@ -25,8 +25,14 @@ button.copy-btn:hover { background: var(--button-hover); }
 #themePanel input[type=color], #themePanel input[type=text] { margin-bottom:5px; width:100%; padding:5px; border-radius:4px; border:1px solid #ccc; }
 #themePanel button { width:100%; padding:5px; border:none; border-radius:4px; background:#4CAF50; color:white; cursor:pointer; }
 #themePanel button:hover { background:#45a049; }
+
 /* Mobile */
-@media(max-width:600px){ #charPanel{grid-template-columns:repeat(auto-fill,minmax(30px,1fr));} .char-btn{font-size:1.2em;padding:6px;} #themeBtn{font-size:1em;padding:6px;} }
+@media(max-width:600px){
+  #charPanel{grid-template-columns:repeat(auto-fill,minmax(30px,1fr));}
+  .char-btn{font-size:1.2em;padding:6px;}
+  #themeBtn{font-size:1em;padding:6px;}
+  #charPanel {min-height:400px;}
+}
 </style>
 </head>
 <body>
@@ -45,7 +51,7 @@ button.copy-btn:hover { background: var(--button-hover); }
   <input type="color" id="bgColorPicker" value="#fff8dc">
   <label>Hex Kodu Gir</label>
   <input type="text" id="bgHexInput" placeholder="#fff8dc">
-  <button onclick="applyTheme()">Tamam</button>
+  <button id="applyThemeBtn">Tamam</button>
 </div>
 
 <script>
@@ -53,17 +59,28 @@ const panel = document.getElementById('charPanel');
 const topText = document.getElementById('topText');
 const copySound = document.getElementById('copySound');
 
-// Unicode karakterleri (~1.1-1.9M)
-const unicodeData = [];
-for(let i=0x0020;i<=0x10FFFF;i++){
-  try{ unicodeData.push(String.fromCodePoint(i)); }
-  catch(e){ continue; }
-}
+// Unicode karakterleri (performans için blok blok yüklenecek)
+const unicodeBlocks = [
+  [0x0020, 0x007F],   // Basic Latin
+  [0x00A0, 0x00FF],   // Latin-1 Supplement
+  [0x0400, 0x04FF],   // Cyrillic
+  [0x1F300, 0x1F5FF], // Emojiler
+  [0x1F600, 0x1F64F], // Smileys
+  [0x0370, 0x03FF],   // Greek
+  // diğer bloklar isteğe göre eklenebilir
+];
+let unicodeData = [];
+
+unicodeBlocks.forEach(block=>{
+  for(let i=block[0];i<=block[1];i++){
+    try{ unicodeData.push(String.fromCodePoint(i)); }
+    catch(e){ continue; }
+  }
+});
 
 let loadedChars = 0;
-const chunkSize = 500;
+const chunkSize = 1000; // başlangıçta daha fazla yükle, scroll hemen oluşur
 
-// Sürekli scroll yükleme
 function loadMoreChars(){
   const end = Math.min(loadedChars + chunkSize, unicodeData.length);
   for(let i=loadedChars; i<end; i++){
@@ -88,7 +105,7 @@ loadMoreChars();
 // Kopyala ve ses
 function copyAll(){
   navigator.clipboard.writeText(topText.value)
-    .then(()=>{ copySound.play(); alert("Kopyalandı!"); })
+    .then(()=>{ copySound.play(); /* toast mesaj yerine alert opsiyonel */ })
     .catch(err=>alert("Kopyalama başarısız: "+err));
 }
 
@@ -99,12 +116,13 @@ themeBtn.addEventListener('click', ()=>{ themePanel.style.display = themePanel.s
 
 // Tema uygula ve kaydet
 function applyTheme(){
-  let hex = document.getElementById('bgHexInput').value.trim();
-  let color = document.getElementById('bgColorPicker').value;
-  const finalColor = hex !== '' ? hex : color;
+  const hex = document.getElementById('bgHexInput').value.trim();
+  const color = document.getElementById('bgColorPicker').value;
+  const finalColor = /^#([0-9A-F]{3}){1,2}$/i.test(hex) ? hex : color;
   document.documentElement.style.setProperty('--bg-color', finalColor);
-  localStorage.setItem('savedTheme', finalColor); // Her değişiklikte kaydet
+  localStorage.setItem('savedTheme', finalColor);
 }
+document.getElementById('applyThemeBtn').addEventListener('click', applyTheme);
 
 // Sayfa açıldığında kaydedilen temayı uygula
 window.addEventListener('load', ()=>{
