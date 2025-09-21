@@ -6,7 +6,7 @@
   <title>Henry Games Unicode Pad</title>
   <style>
     :root {
-      --bg-color: #fdf7e3;
+      --bg-color: #fdf7e3; /* ilk açılış krem renk */
       --panel-bg: #ffffff;
       --button-color: #f0f0f0;
     }
@@ -22,18 +22,11 @@
     header {
       background: var(--bg-color);
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      text-align: center;
       font-size: 1.4rem;
       font-weight: bold;
       padding: 10px;
       position: relative;
-    }
-    #logo {
-      position: absolute;
-      left: 10px;
-      height: 40px;
     }
     #settingsBtn {
       position: absolute;
@@ -108,7 +101,6 @@
 </head>
 <body>
   <header>
-    <img src="hg.png" id="logo" alt="Logo">
     Henry Games Unicode Pad
     <span id="settingsBtn">⚙️</span>
   </header>
@@ -118,6 +110,7 @@
 
   <div id="charPanel"></div>
 
+  <!-- Tema Paneli -->
   <div id="themePanel">
     <button id="closeTheme">❌</button>
     <label>Renk Seç:</label>
