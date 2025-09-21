@@ -89,6 +89,13 @@
     #themePanel button {
       padding: 6px 10px;
     }
+    #closeTheme {
+      float: right;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -98,6 +105,7 @@
   </header>  <textarea id="selectedBox" placeholder="Seçilen karakterler buraya eklenecek..."></textarea><button id="copyBtn">Kopyala 📋</button>
 
   <div id="charPanel"></div>  <!-- Tema Paneli -->  <div id="themePanel">
+    <button id="closeTheme">❌</button>
     <label>Renk Seç:</label>
     <input type="color" id="bgColorPicker" value="#fdf7e3">
     <input type="text" id="bgHexInput" placeholder="#HEX">
@@ -109,9 +117,9 @@
     const selectedBox = document.getElementById('selectedBox');
     const copySound = document.getElementById('copySound');
 
-    let currentCode = 33; // Başlangıç: ! karakteri
-    const chunkSize = 1500; // masaüstü için daha büyük chunk
-    const maxCodePoint = 65535; // BMP (tarayıcıyı yormasın diye)
+    let currentCode = 33;
+    const chunkSize = 1500;
+    const maxCodePoint = 65535;
 
     function loadChunk() {
       const frag = document.createDocumentFragment();
@@ -138,9 +146,12 @@
       copySound.play();
     });
 
-    // Tema Paneli Aç/Kapat
     document.getElementById('settingsBtn').addEventListener('click', () => {
       document.getElementById('themePanel').style.display = 'block';
+    });
+
+    document.getElementById('closeTheme').addEventListener('click', () => {
+      document.getElementById('themePanel').style.display = 'none';
     });
 
     function applyTheme() {
@@ -152,13 +163,12 @@
       document.getElementById('themePanel').style.display = 'none';
     }
 
-    // Sayfa yüklenince kaydedilmiş tema uygula
     window.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem('savedTheme');
       if (saved) {
         document.documentElement.style.setProperty('--bg-color', saved);
       }
-      loadChunk(); // ilk chunk yükle
+      loadChunk();
     });
   </script></body>
 </html>
